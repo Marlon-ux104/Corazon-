@@ -1,4 +1,3 @@
-// main.js
 (() => {
   // DOM
   const enterBtn = document.getElementById('enterBtn');
@@ -9,31 +8,10 @@
   const nameInput = document.getElementById('nameInput');
   const startBtn = document.getElementById('startBtn');
   const resetBtn = document.getElementById('resetBtn');
-  const speedRange = document.getElementById('speedRange');
-
-  // Sizes
-  let W = canvas.width;
-  let H = canvas.height;
-  let CX = W/2;
-  let CY = H/2;
 
   // Points
   let points = [];
   const NUM_POINTS = 120;
-
-  function rand(min, max){ return Math.floor(Math.random()*(max-min+1))+min }
-  function hex(rgb){ return '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('') }
-
-  // Color interpolation helper
-  function lerp(a,b,t){ return Math.round(a + (b-a)*t); }
-  function mixColor(hexA, hexB, t){
-    const a = hexA.replace('#','');
-    const b = hexB.replace('#','');
-    const ar = parseInt(a.substr(0,2),16), ag = parseInt(a.substr(2,2),16), ab = parseInt(a.substr(4,2),16);
-    const br = parseInt(b.substr(0,2),16), bg = parseInt(b.substr(2,2),16), bb = parseInt(b.substr(4,2),16);
-    const r = lerp(ar,br,t), g = lerp(ag,bg,t), b2 = lerp(ab,bb,t);
-    return hex([r,g,b2]);
-  }
 
   // Heart pattern
   const heartPattern = [
@@ -54,25 +32,47 @@
     "              *              "
   ];
 
+  let heartContent = '';
+  let lines = [];
+  let letterI = 0, letterJ = 0;
+  let animating = false;
+  let growPhase = 0;
+  const SMALL = '#9a0f29';
+  const LARGE = '#cf1462';
+
+  // Responsive canvas
+  let W = canvas.width;
+  let H = canvas.height;
+  let CX = W / 2;
+  let CY = H / 2;
+
+  function rand(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function hex(rgb){ return '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join(''); }
+  function lerp(a,b,t){ return Math.round(a + (b-a)*t); }
+  function mixColor(hexA, hexB, t){
+    const a = hexA.replace('#','');
+    const b = hexB.replace('#','');
+    const ar = parseInt(a.substr(0,2),16), ag = parseInt(a.substr(2,2),16), ab = parseInt(a.substr(4,2),16);
+    const br = parseInt(b.substr(0,2),16), bg = parseInt(b.substr(2,2),16), bb = parseInt(b.substr(4,2),16);
+    const r = lerp(ar,br,t), g = lerp(ag,bg,t), b2 = lerp(ab,bb,t);
+    return hex([r,g,b2]);
+  }
+
   function nameHeart(name){
     name = name || 'corazon';
     name = (name.repeat(200)).slice(0,200);
     let idx = 0;
-    const lines = [];
+    const arr = [];
     for(const row of heartPattern){
       let line = '';
       for(const ch of row){
-        if(ch === '*'){
-          line += name[idx % name.length];
-          idx++;
-        } else line += ' ';
+        line += ch === '*' ? name[idx++ % name.length] : ' ';
       }
-      lines.push(line);
+      arr.push(line);
     }
-    return lines;
+    return arr;
   }
 
-  // Points initialization
   function initPoints(){
     points = [];
     for(let i=0;i<NUM_POINTS;i++){
@@ -89,15 +89,8 @@
     }
   }
 
-  // Animation state
-  let heartContent = '';
-  let animating = false;
-  let letterI = 0, letterJ = 0, lines = [];
-  let growPhase = 0;
-  const SMALL = '#9a0f29';
-  const LARGE = '#cf1462';
-
   function clear(){ ctx.clearRect(0,0,W,H); }
+
   function drawPoints(){
     for(const p of points){
       p.timer--;
@@ -120,11 +113,10 @@
 
     const t = 0.5 + 0.5*Math.sin(growPhase);
 
-    // draw heart content
     const linesArr = heartContent.split('\n');
     const lineHeight = fontSize * 0.85;
     const totalH = linesArr.length * lineHeight;
-    let startY = CY - totalH/2 + lineHeight/2;
+    const startY = CY - totalH/2 + lineHeight/2;
 
     ctx.fillStyle = color;
     for(let i=0;i<linesArr.length;i++){
@@ -153,25 +145,21 @@
     }
 
     growPhase += 0.12;
-    const t = 0.5 + 0.5*Math.sin(growPhase);
 
-    // Ajuste de tamaño responsive usando ancho y alto
-    const baseSize = Math.min(W,H) / 30;
+    // Escala el corazón al tamaño del canvas (móvil o PC)
+    const baseSize = Math.min(W,H) / 20;
     const amplitude = baseSize / 2;
-    const size = baseSize + amplitude * t;
-    const color = mixColor(SMALL, LARGE, t);
+    const size = baseSize + amplitude * (0.5 + 0.5*Math.sin(growPhase));
+    const color = mixColor(SMALL, LARGE, 0.5 + 0.5*Math.sin(growPhase));
 
     if(heartContent){
-      drawHeartText(color, size*2.2);
+      drawHeartText(color, size);
     }
 
     requestAnimationFrame(frame);
   }
 
-  initPoints();
-  requestAnimationFrame(frame);
-
-  // Controls
+  // Controles
   enterBtn.addEventListener('click', () => {
     welcome.classList.add('hidden');
     heartSection.classList.remove('hidden');
@@ -195,16 +183,18 @@
     growPhase = 0;
   });
 
-  // Responsive canvas
   function resizeCanvas(){
-    W = Math.min(window.innerWidth * 0.9, 900);
-    H = Math.min(window.innerHeight * 0.7, 700);
+    W = window.innerWidth * 0.95;   // ancho móvil 95% pantalla
+    H = window.innerHeight * 0.7;   // alto 70% pantalla
     CX = W/2; CY = H/2;
     canvas.width = W;
     canvas.height = H;
   }
 
   window.addEventListener('resize', resizeCanvas);
+
+  initPoints();
   resizeCanvas();
+  requestAnimationFrame(frame);
 
 })();
