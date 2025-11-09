@@ -8,6 +8,7 @@
   const nameInput = document.getElementById('nameInput');
   const startBtn = document.getElementById('startBtn');
   const resetBtn = document.getElementById('resetBtn');
+  const uiTop = document.getElementById('uiTop');
 
   // Points
   let points = [];
@@ -111,8 +112,6 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const t = 0.5 + 0.5*Math.sin(growPhase);
-
     const linesArr = heartContent.split('\n');
     const lineHeight = fontSize * 0.85;
     const totalH = linesArr.length * lineHeight;
@@ -144,10 +143,10 @@
       }
     }
 
-    growPhase += 0.12;
+    // Latido más lento
+    growPhase += 0.05;
 
-    // Escala el corazón al tamaño del canvas (móvil o PC)
-    const baseSize = Math.min(W,H) / 20;
+    const baseSize = Math.min(W,H) / 25;
     const amplitude = baseSize / 2;
     const size = baseSize + amplitude * (0.5 + 0.5*Math.sin(growPhase));
     const color = mixColor(SMALL, LARGE, 0.5 + 0.5*Math.sin(growPhase));
@@ -161,6 +160,11 @@
 
   // Controles
   enterBtn.addEventListener('click', () => {
+    // Oculta el botón y el mensaje inmediatamente
+    enterBtn.style.display = 'none';
+    document.querySelector('#welcome h1').style.display = 'none';
+
+    // Oculta toda la sección welcome y muestra el corazón
     welcome.classList.add('hidden');
     heartSection.classList.remove('hidden');
   });
@@ -168,6 +172,10 @@
   startBtn.addEventListener('click', () => {
     const name = nameInput.value.trim();
     if(!name) return;
+
+    // Oculta los inputs y botón de crear corazón
+    uiTop.style.display = 'none';
+
     lines = nameHeart(name);
     heartContent = '';
     letterI = 0; letterJ = 0;
@@ -181,11 +189,14 @@
     lines = [];
     letterI = 0; letterJ = 0;
     growPhase = 0;
+
+    // Vuelve a mostrar los inputs para crear otro corazón
+    uiTop.style.display = 'flex';
   });
 
   function resizeCanvas(){
-    W = window.innerWidth * 0.95;   // ancho móvil 95% pantalla
-    H = window.innerHeight * 0.7;   // alto 70% pantalla
+    W = window.innerWidth * 0.95;   
+    H = window.innerHeight * 0.7;   
     CX = W/2; CY = H/2;
     canvas.width = W;
     canvas.height = H;
