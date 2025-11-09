@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Corazón para ti</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <main>
+    <section id="welcome">
+      <h1>Clic en Entrar</h1>
+      <button id="enterBtn">Entrar</button>
+    </section>
+
+    <section id="heartSection" class="hidden">
+      <div id="uiTop">
+        <input id="nameInput" type="text" placeholder="Escribe un nombre..." />
+        <button id="startBtn">Crear corazón</button>
+      </div>
+
+      <canvas id="stage" width="900" height="700" aria-label="Animación del corazón"></canvas>
+
+      <div id="controls">
+        <label>Velocidad puntos:
+          <input id="speedRange" type="range" min="30" max="300" value="100" />
+        </label>
+        <button id="resetBtn">Reiniciar</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
