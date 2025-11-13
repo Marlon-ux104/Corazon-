@@ -236,16 +236,23 @@
       if (uiTop) uiTop.style.display = 'flex';
     });
   }
-
-  function resizeCanvas(){
-    W = Math.min(window.innerWidth - 40, 900);
-    H = Math.min(window.innerHeight - 120, 700);
-    CX = W/2; CY = H/2;
-    if (canvas) {
-      canvas.width = W;
-      canvas.height = H;
-    }
+// ...existing code...
+function resizeCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  W = Math.min(window.innerWidth - 40, 900);
+  H = Math.min(window.innerHeight - 120, 700);
+  CX = W/2; CY = H/2;
+  if (canvas) {
+    // tamaño CSS
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    // tamaño real teniendo en cuenta DPR
+    canvas.width = Math.floor(W * dpr);
+    canvas.height = Math.floor(H * dpr);
+    if (ctx) ctx.setTransform(dpr,0,0,dpr,0,0);
   }
+}
+// ...existing code...
 
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
