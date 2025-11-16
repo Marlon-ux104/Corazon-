@@ -258,3 +258,51 @@ function resizeCanvas(){
   resizeCanvas();
 
 })();
+
+const cometas = [document.createElement('div'), document.createElement('div'), document.createElement('div')];
+
+// Configurar estilo base de cada cometa
+cometas.forEach(c => {
+  c.style.position = 'fixed';
+  c.style.top = '0px';
+  c.style.left = '0px';
+  c.style.width = '4px';
+  c.style.height = '4px';
+  c.style.background = 'white';
+  c.style.borderRadius = '50%';
+  c.style.boxShadow = '0 0 8px #aee7ff';
+  c.style.opacity = 0;
+  c.style.pointerEvents = 'none';
+  document.body.appendChild(c);
+});
+
+// Función para lanzar un cometa individual
+function lanzarCometa(cometa) {
+  const startX = Math.random() * 100;
+  const startY = Math.random() * 100;
+  const endX = startX + 300 + Math.random() * 200;
+  const endY = startY + 150 + Math.random() * 150;
+  const duration = 1800 + Math.random() * 1000; // velocidad variable
+
+  cometa.style.transition = `transform ${duration}ms linear, opacity ${duration}ms linear`;
+  cometa.style.opacity = 1;
+  cometa.style.transform = `translate(${endX}px, ${endY}px)`;
+
+  setTimeout(() => {
+    cometa.style.transition = 'none';
+    cometa.style.opacity = 0;
+    cometa.style.transform = `translate(0,0)`;
+  }, duration);
+}
+
+// Lanzar los 3 cometas en secuencia con retardo
+function lanzarSecuencia() {
+  cometas.forEach((c, i) => {
+    setTimeout(() => {
+      lanzarCometa(c);
+    }, i * 1000); // cada cometa aparece 1s después del anterior
+  });
+}
+
+// Repetir la secuencia cada 6-8 segundos
+setInterval(lanzarSecuencia, 7000);
